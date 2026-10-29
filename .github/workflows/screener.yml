@@ -1,0 +1,49 @@
+name: Stock screener
+
+on:
+  workflow_dispatch:
+    inputs:
+      universe:
+        description: "watchlist | sp500 | nasdaq100 (combina con +)"
+        default: "sp500"
+      profile:
+        description: "general | growth | momentum | breakout | dip"
+        default: "general"
+      top:
+        description: "Cuántas acciones mostrar"
+        default: "10"
+      sector:
+        description: "Filtro de sector (opcional, p. ej. technology)"
+        default: ""
+  schedule:
+    - cron: "30 21 * * 1-5"   # lunes a viernes, tras el cierre (UTC)
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stockbot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: stockbot/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Run screener
+        env:
+          UNIVERSE: ${{ inputs.universe || 'sp500' }}
+          PROFILE: ${{ inputs.profile || 'general' }}
+          TOP: ${{ inputs.top || '10' }}
+          SECTOR: ${{ inputs.sector }}
+        run: |
+          args=(--universe "$UNIVERSE" --profile "$PROFILE" --top "$TOP")
+          if [ -n "$SECTOR" ]; then args+=(--sector "$SECTOR"); fi
+          python bot.py "${args[@]}" | tee report.txt
+          { echo '```'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reporte
+          path: stockbot/report.txt
