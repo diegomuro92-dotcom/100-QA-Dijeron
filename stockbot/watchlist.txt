@@ -1,0 +1,25 @@
+# Un ticker por línea. Edita libremente (tecnología, small caps, temas en boom).
+# IA / semiconductores
+NVDA
+AMD
+AVGO
+SMCI
+ARM
+CRDO
+ALAB
+ONDS
+# Software / cloud / ciberseguridad
+PLTR
+SNOW
+CRWD
+NET
+DDOG
+S
+# Small caps de crecimiento / temas especulativos
+IONQ
+RGTI
+SOUN
+RKLB
+ASTS
+HIMS
+APP
